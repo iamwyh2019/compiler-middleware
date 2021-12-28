@@ -46,6 +46,7 @@ void Parser::parse() {
         cout << ginit_name << " [0] [0]" << endl;
         for (auto &stmt: ginit)
             cout << '\t' << stmt << endl;
+        cout << "return" << endl;
         cout << "end " << ginit_name << endl;
     }
 
@@ -85,9 +86,9 @@ void Parser::addStmt(const string &stmt) {
 string Parser::getName(string &name) {
     if (name[0] == 'p')
         return "a" + name.substr(1);
-    auto iter = gscope.find(name);
-    if (iter != gscope.end())
-        return iter->second;
     auto iter2 = scope.find(name);
-    return to_string(iter2->second);
+    if (iter2 != scope.end())
+        return to_string(iter2->second);
+    auto iter = gscope.find(name);
+    return iter->second;
 }
