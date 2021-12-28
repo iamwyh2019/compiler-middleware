@@ -1,16 +1,20 @@
 %{
+#define YYSTYPE void*
 #include <iostream>
 #include <string>
 #include <cstring>
 #include "parser_e.tab.h"
 #include "tiggerclass.h"
 using namespace std;
-#define YYSTYPE void*
 int charNum = 1;
 %}
 %option yylineno
 
 digit [0-9]
+letter_ [A-Za-z_]
+ident {letter_}({letter_}|{digit})*
+fname f_{ident}
+label l{digit}+
 
 %%
 [\040\t]    {charNum += yyleng;}
@@ -20,6 +24,27 @@ return  {charNum += yyleng; return RETURN;}
 var     {charNum += yyleng; return VAR;}
 goto    {charNum += yyleng; return GOTO;}
 call    {charNum += yyleng; return CALL;}
+param   {charNum += yyleng; return PARAM;}
+label   {
+    charNum += yyleng;
+    yylval = new string(yytext);
+    return LABEL;
+}
+[Ttp]{digit}+   {
+    charNum += yyleng;
+    yylval = new string(yytext);
+    return IDENT;
+}
+{fname}     {
+    charNum += yyleng;
+    yylval = new string(yytext);
+    return FUNC;
+}
+{digit}+    {
+    charNum += yyleng;
+    yylval = new int(strtol(yytext, nullptr, 10));
+    return NUM;
+}
 ":"     {++charNum; return COLON;}
 "+"     {++charNum; return ADD;}
 "-"     {++charNum; return SUB;}
