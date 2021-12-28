@@ -145,6 +145,21 @@ Expression: IDENT ASSIGN RVal BinOp RVal
 
         s_count = 0;
     }
+    | IDENT ASSIGN IDENT LBRAC RVal RBRAC
+    {
+        string &name = *(string*)$1;
+        string loadname = parser.getName(name);
+
+        string &arrname = *(string*)$3;
+        string loadarrname = parser.getName(arrname);
+
+        parser.addStmt("loadaddr " + loadarrname + " s2");
+        parser.addStmt("s2 = s2 + s1");
+        parser.addStmt("s0 = s2[0]");
+
+        addStore(loadname, "s0");
+        s_count = 0;
+    }
     ;
 
 RVal:   NUM
