@@ -142,7 +142,10 @@ Expression: IDENT ASSIGN RVal BinOp RVal
     {
         string &name = *(string*)$1;
         string loadname = parser.getName(name);
-        parser.addStmt("loadaddr " + loadname + " s0");
+        if (loadname[0] == 'a')
+            parser.addStmt("s0 = " + loadname);
+        else
+            parser.addStmt("loadaddr " + loadname + " s0");
         
         parser.addStmt("s0 = s0 + s1");
         parser.addStmt("s0[0] = s2");
@@ -157,7 +160,10 @@ Expression: IDENT ASSIGN RVal BinOp RVal
         string &arrname = *(string*)$3;
         string loadarrname = parser.getName(arrname);
 
-        parser.addStmt("loadaddr " + loadarrname + " s2");
+        if (loadarrname[0] == 'a')
+            parser.addStmt("s2 = " + loadarrname);
+        else
+            parser.addStmt("loadaddr " + loadarrname + " s2");
         parser.addStmt("s2 = s2 + s1");
         parser.addStmt("s0 = s2[0]");
 
