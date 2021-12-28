@@ -46,6 +46,11 @@ end     {charNum += yyleng; return END;}
     yylval = new int(strtol(yytext, nullptr, 10));
     return NUM;
 }
+"-"{digit}+ {
+    charNum += yyleng;
+    yylval = new int(strtol(yytext, nullptr, 10));
+    return NUM;
+}
 ":"     {++charNum; return COLON;}
 "+"     {++charNum; return ADD;}
 "-"     {++charNum; return SUB;}
