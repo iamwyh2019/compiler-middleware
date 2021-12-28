@@ -26,11 +26,12 @@ class Parser {
     map<string, Variable*> gscope;
     vector<string> ginit;
     vector<string> gdecl;
+    map<string, int> scope;
 
     Variable* newGVar(string&);
 public:
     Parser();
-    void addGInit(string&, int, int=0);
+    void addGInit(string&, int, int=0, bool=false);
     void addGDecl(string&, int=0);
     void parse();
 };

@@ -25,11 +25,22 @@ Variable* Parser::newGVar(string &name) {
     return gvar;
 }
 
-void Parser::addGInit(string &name, int val, int index) {
+void Parser::addGInit(string &name, int val, int index, bool is_array) {
+    static string last_var;
     auto gvar = gscope[name];
-    ginit.emplace_back("load " + to_string(val) + " t1");
-    ginit.emplace_back("loadaddr " + gvar->tigger_name + " t0");
-    ginit.emplace_back("t0[" + to_string(index) + "] = t1");
+    if (val != 0) {
+        if (last_var != name)
+            ginit.emplace_back("loadaddr " + gvar->tigger_name + " t0");
+        ginit.emplace_back("load " + to_string(val) + " t1");
+        ginit.emplace_back("t0[" + to_string(index) + "] = t1");
+        last_var = name;
+    }
+    else if (is_array) {
+        if (last_var != name)
+            ginit.emplace_back("loadaddr " + gvar->tigger_name + " t0");
+        ginit.emplace_back("t0[" + to_string(index) + "] = x0");
+        last_var = name;
+    }
 }
 
 void Parser::addGDecl(string &name, int len) {

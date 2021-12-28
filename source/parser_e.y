@@ -57,7 +57,7 @@ Initialization: IDENT ASSIGN NUM
         string &name = *(string*)$1;
         int index = V($3);
         int val = V($6);
-        parser.addGInit(name, val, index);
+        parser.addGInit(name, val, index, true);
     }
 
 %%
