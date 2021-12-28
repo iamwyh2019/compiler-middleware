@@ -17,16 +17,17 @@ extern FILE *yyin;
 extern int yylineno, charNum;
 
 int s_count = 0;
+int p_count = 0;
 
 Parser parser;
 
-void addStore(const string &loadname, const string &target) {
+void addStore(const string &loadname) {
     if (loadname[0] == 'v') { // global variable
         parser.addStmt("loadaddr " + loadname + " s4");
-        parser.addStmt("s4[0] = " + target);
+        parser.addStmt("s4[0] = s0");
     }
     else {
-        parser.addStmt("store " + target + " " + loadname);
+        parser.addStmt("store s0 "+ loadname);
     }
 }
 
@@ -112,7 +113,7 @@ Expression: IDENT ASSIGN RVal BinOp RVal
         string &op = *(string*)$4;
         parser.addStmt("s0 = s1 " + op + " s2");
 
-        addStore(loadname, "s0");
+        addStore(loadname);
         s_count = 0;
     }
     | IDENT ASSIGN Op RVal
@@ -122,7 +123,7 @@ Expression: IDENT ASSIGN RVal BinOp RVal
         string &op = *(string*)$3;
         parser.addStmt("s0 = " + op + " s1");
 
-        addStore(loadname, "s0");
+        addStore(loadname);
         s_count = 0;
     }
     | IDENT ASSIGN RVal
@@ -131,7 +132,7 @@ Expression: IDENT ASSIGN RVal BinOp RVal
         string loadname = parser.getName(name);
         parser.addStmt("s0 = s1");
 
-        addStore(loadname, "s0");
+        addStore(loadname);
         s_count = 0;
     }
     | IDENT LBRAC RVal RBRAC ASSIGN RVal
@@ -157,7 +158,56 @@ Expression: IDENT ASSIGN RVal BinOp RVal
         parser.addStmt("s2 = s2 + s1");
         parser.addStmt("s0 = s2[0]");
 
-        addStore(loadname, "s0");
+        addStore(loadname);
+        s_count = 0;
+    }
+    | IF RVal LogicOp RVal GOTO LABEL
+    {
+        string &op = *(string*)$3;
+        string &label = *(string*)$6;
+        parser.addStmt("if s1 " + op + " s2 goto " + label);
+        s_count = 0;
+    }
+    | GOTO LABEL
+    {
+        string &label = *(string*)$2;
+        parser.addStmt("goto " + label);
+    }
+    | LABEL COLON
+    {
+        string &label = *(string*)$1;
+        parser.addStmt(label + ":");
+    }
+    | PARAM RVal
+    {
+        parser.addStmt("a" + to_string(p_count++) + " = s1");
+        s_count = 0;
+    }
+    | CALL FUNC
+    {
+        p_count = 0;
+        string &funcname = *(string*)$2;
+        parser.addStmt("call " + funcname);
+    }
+    | IDENT ASSIGN CALL FUNC
+    {
+        p_count = 0;
+        string &funcname = *(string*)$2;
+        string &name = *(string*)$1;
+        string loadname = parser.getName(name);
+
+        parser.addStmt("call " + funcname);
+        parser.addStmt("s0 = a0");
+        addStore(loadname);
+    }
+    | RETURN
+    {
+        parser.addStmt("return");
+    }
+    | RETURN RVal
+    {
+        parser.addStmt("a0 = s1");
+        parser.addStmt("return");
         s_count = 0;
     }
     ;
