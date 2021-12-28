@@ -26,7 +26,7 @@ goto    {charNum += yyleng; return GOTO;}
 call    {charNum += yyleng; return CALL;}
 param   {charNum += yyleng; return PARAM;}
 end     {charNum += yyleng; return END;}
-label   {
+{label}   {
     charNum += yyleng;
     yylval = new string(yytext);
     return LABEL;
