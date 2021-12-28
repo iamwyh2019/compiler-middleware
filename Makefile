@@ -41,3 +41,7 @@ $(YACC_OUT): $(SOURCE_DIR)/parser_e.y
 .PHONY: clean
 clean:
 	rm -f $(BUILD_DIR)/*
+
+.PHONY: test
+test: $(TARGET_DIR)
+	$(TARGET_DIR) -S -t test/test.in -o test/test.out
