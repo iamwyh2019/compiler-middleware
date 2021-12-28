@@ -16,16 +16,49 @@ extern int yyparse();
 extern FILE *yyin;
 extern int yylineno, charNum;
 
+Parser parser;
+
 %}
 
 %token ADD SUB MUL DIV MOD
 %token ASSIGN EQ NEQ LE LEQ GE GEQ NOT AND OR
 %token NUM IDENT
 %token LBRAC RBRAC
-%token IF GOTO LABEL PARAM CALL RETURN COLON VAR FUNC
+%token IF GOTO LABEL PARAM CALL RETURN COLON VAR FUNC END
 
 %%
-CompUnit: ADD;
+Program:    Declaration
+    | Program Declaration
+    | Initialization
+    | Program Initialization
+    ;
+
+Declaration:    VAR IDENT 
+    {
+        string &name = *(string*)$2;
+        parser.addGDecl(name, 0);
+    }
+    | VAR NUM IDENT
+    {
+        string &name = *(string*)$3;
+        int len = V($2);
+        parser.addGDecl(name, len);
+    }
+    ;
+
+Initialization: IDENT ASSIGN NUM
+    {
+        string &name = *(string*)$1;
+        int val = V($3);
+        parser.addGInit(name, val);
+    }
+    | IDENT LBRAC NUM RBRAC ASSIGN NUM
+    {
+        string &name = *(string*)$1;
+        int index = V($3);
+        int val = V($6);
+        parser.addGInit(name, val, index);
+    }
 
 %%
 
@@ -49,6 +82,7 @@ int main(int argc, char **argv) {
             yyerror("Cannot open output file.");
 
     yyparse();
+    parser.parse();
 
     fclose(yyin);
     return 0;
