@@ -31,7 +31,7 @@ void Parser::addGInit(string &name, int val, int index, bool is_array) {
     if (val != 0) {
         if (last_var != name)
             ginit.emplace_back("loadaddr " + gvar->tigger_name + " t0");
-        ginit.emplace_back("load " + to_string(val) + " t1");
+        ginit.emplace_back("t1 = " + to_string(val));
         ginit.emplace_back("t0[" + to_string(index) + "] = t1");
         last_var = name;
     }
