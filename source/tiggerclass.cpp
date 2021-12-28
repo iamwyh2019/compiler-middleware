@@ -83,6 +83,8 @@ void Parser::addStmt(const string &stmt) {
 }
 
 string Parser::getName(string &name) {
+    if (name[0] == 'p')
+        return "a" + name.substr(1);
     auto iter = gscope.find(name);
     if (iter != gscope.end())
         return iter->second;

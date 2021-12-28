@@ -26,7 +26,10 @@ void addStore(const string &loadname) {
         parser.addStmt("loadaddr " + loadname + " s4");
         parser.addStmt("s4[0] = s0");
     }
-    else {
+    else if (loadname[0] == 'a') {
+        parser.addStmt(loadname + " = s0");
+    }
+    else{
         parser.addStmt("store s0 "+ loadname);
     }
 }
@@ -192,7 +195,7 @@ Expression: IDENT ASSIGN RVal BinOp RVal
     | IDENT ASSIGN CALL FUNC
     {
         p_count = 0;
-        string &funcname = *(string*)$2;
+        string &funcname = *(string*)$4;
         string &name = *(string*)$1;
         string loadname = parser.getName(name);
 
