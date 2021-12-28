@@ -20,8 +20,15 @@ TARGET_DIR = $(BUILD_DIR)/$(TARGET_EXEC)
 # YACC OUTPUT
 YACC_OUT = $(BUILD_DIR)/parser_e.tab.h $(BUILD_DIR)/parser_e.tab.c
 
-$(TARGET_DIR): $(BUILD_DIR)/scanner_e.cpp $(BUILD_DIR)/parser_e.tab.c
+# Necessary classes
+CLASS_SOURCE = $(SOURCE_DIR)/tiggerclass.cpp $(SOURCE_DIR)/tiggerclass.h
+CLASS_OUTPUT = $(BUILD_DIR)/tiggerclass.o
+
+$(TARGET_DIR): $(BUILD_DIR)/scanner_e.cpp $(BUILD_DIR)/parser_e.tab.c $(CLASS_OUTPUT)
 	$(CPP) $(CPPFLAGS) -o $@ -I $(SOURCE_DIR) $^
+
+$(CLASS_OUTPUT): $(CLASS_SOURCE)
+	$(CPP) $(CPPFLAGS) -c -o $@ -I $(SOURCE_DIR) $<
 
 $(BUILD_DIR)/scanner_e.cpp: $(SOURCE_DIR)/scanner_e.l $(YACC_OUT)
 	mkdir -p $(dir $@)
