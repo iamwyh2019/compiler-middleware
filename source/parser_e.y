@@ -260,6 +260,7 @@ Op: ADD {$$ = new string("+");}
     | MUL {$$ = new string("*");}
     | DIV {$$ = new string("/");}
     | MOD {$$ = new string("%");}
+    | NOT {$$ = new string("!");}
     ;
 
 LogicOp:    AND {$$ = new string("&&");}
