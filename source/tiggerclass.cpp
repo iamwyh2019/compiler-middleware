@@ -32,7 +32,7 @@ void Parser::addGInit(string &name, int val, int index, bool is_array) {
 void Parser::addGDecl(string &name, int len) {
     bool is_array = (len>0);
     auto gvar = newGVar(name, is_array? ArrType: IntType);
-    if (is_array)
+    if (!is_array)
         gdecl.emplace_back(gvar + " = 0");
     else
         gdecl.emplace_back(gvar + " = malloc " + to_string(len));
