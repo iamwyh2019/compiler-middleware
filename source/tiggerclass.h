@@ -37,7 +37,7 @@ public:
     void parse();
     void newFunc(string&);
     void endFunc();
-    void addVar(string&, VarType, int=1);
+    void addVar(const string&, VarType, int=1);
     void addStmt(const string&);
     string getName(string&);
     VarType getType(string&);

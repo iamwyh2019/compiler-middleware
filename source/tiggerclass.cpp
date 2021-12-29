@@ -78,7 +78,7 @@ void Parser::endFunc() {
     funccost[nowfunc] = stkcost;
 }
 
-void Parser::addVar(string &name, VarType tp, int len) {
+void Parser::addVar(const string &name, VarType tp, int len) {
     scope[name] = stkcost;
     stkcost += len;
     scopetype[name] = tp;
@@ -89,8 +89,6 @@ void Parser::addStmt(const string &stmt) {
 }
 
 string Parser::getName(string &name) {
-    if (name[0] == 'p')
-        return "a" + name.substr(1);
     auto iter2 = scope.find(name);
     if (iter2 != scope.end())
         return to_string(iter2->second);

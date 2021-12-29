@@ -26,9 +26,6 @@ void addStore(const string &loadname, const string &target = "s0") {
         parser.addStmt("loadaddr " + loadname + " s4");
         parser.addStmt("s4[0] = " + target);
     }
-    else if (loadname[0] == 'a') {
-        parser.addStmt(loadname + " = " + target);
-    }
     else{
         parser.addStmt("store " + target + " " + loadname);
     }
@@ -88,6 +85,10 @@ FunctionHeader: FUNC LBRAC NUM RBRAC
         int nparams = V($3);
         parser.addStmt("@" + fname + " [" + to_string(nparams) + "]");
         parser.newFunc(fname);
+        for (int i=0; i<nparams; ++i) {
+            parser.addVar("p"+to_string(i), IntType, 1);
+            parser.addStmt("store a" + to_string(i) + " " + to_string(i));
+        }
     }
 
 Statements: Statement
@@ -142,9 +143,7 @@ Expression: IDENT ASSIGN RVal BinOp RVal
         string &name = *(string*)$1;
         VarType tp = parser.getType(name);
         string loadname = parser.getName(name);
-        if (loadname[0] == 'a')
-            parser.addStmt("s0 = " + loadname);
-        else if (tp == ArrType)
+        if (tp == ArrType)
             parser.addStmt("loadaddr " + loadname + " s0");
         else
             parser.addStmt("load " + loadname + " s0");
@@ -163,9 +162,7 @@ Expression: IDENT ASSIGN RVal BinOp RVal
         string loadarrname = parser.getName(arrname);
         VarType loadtp = parser.getType(arrname);
 
-        if (loadarrname[0] == 'a')
-            parser.addStmt("s2 = " + loadarrname);
-        else if (loadtp == ArrType)
+        if (loadtp == ArrType)
             parser.addStmt("loadaddr " + loadarrname + " s2");
         else
             parser.addStmt("load " + loadarrname + " s2");
@@ -237,18 +234,12 @@ RVal:   NUM
     {
         string regname = "s" + to_string(++s_count);
         string name = *(string*)$1;
-        if (name[0] == 'p') {
-            name[0] = 'a';
-            parser.addStmt(regname + " = " + name);
-        }
-        else {
-            string loadname = parser.getName(name);
-            VarType tp = parser.getType(name);
-            if (tp == IntType)
-                parser.addStmt("load " + loadname + " " + regname);
-            else
-                parser.addStmt("loadaddr " + loadname + " " + regname);
-        }
+        string loadname = parser.getName(name);
+        VarType tp = parser.getType(name);
+        if (tp == IntType)
+            parser.addStmt("load " + loadname + " " + regname);
+        else
+            parser.addStmt("loadaddr " + loadname + " " + regname);
     }
     ;
 
