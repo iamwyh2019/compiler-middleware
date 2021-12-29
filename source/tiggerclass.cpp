@@ -4,9 +4,10 @@ Parser::Parser() {
     global_count = 0;
 }
 
-string Parser::newGVar(string &name) {
+string Parser::newGVar(string &name, VarType tp) {
     string gvar = "v" + to_string(global_count++);
     gscope[name] = gvar;
+    gtype[name] = tp;
     return gvar;
 }
 
@@ -29,8 +30,9 @@ void Parser::addGInit(string &name, int val, int index, bool is_array) {
 }
 
 void Parser::addGDecl(string &name, int len) {
-    auto gvar = newGVar(name);
-    if (len == 0)
+    bool is_array = (len>0);
+    auto gvar = newGVar(name, is_array? ArrType: IntType);
+    if (is_array)
         gdecl.emplace_back(gvar + " = 0");
     else
         gdecl.emplace_back(gvar + " = malloc " + to_string(len));
@@ -72,11 +74,14 @@ void Parser::newFunc(string &funcname) {
 
 void Parser::endFunc() {
     scope.clear();
+    scopetype.clear();
     funccost[nowfunc] = stkcost;
 }
 
-void Parser::addVar(string &name) {
-    scope[name] = stkcost++;
+void Parser::addVar(string &name, VarType tp, int len) {
+    scope[name] = stkcost;
+    stkcost += len;
+    scopetype[name] = tp;
 }
 
 void Parser::addStmt(const string &stmt) {
@@ -91,4 +96,14 @@ string Parser::getName(string &name) {
         return to_string(iter2->second);
     auto iter = gscope.find(name);
     return iter->second;
+}
+
+VarType Parser::getType(string &name) {
+    auto iter2 = scopetype.find(name);
+    if (iter2 != scopetype.end())
+        return iter2->second;
+    auto iter = gtype.find(name);
+    if (iter != gtype.end())
+        return iter->second;
+    return IntType;
 }
